@@ -27,6 +27,7 @@ def display_movement(containers, investment_id, movement, movement_id):
         unsafe_allow_html = True)
 	date_col_container.date_input("Date",
         key               = "date_%d_%d" % (investment_id, movement_id),
+        help              = "The date the movement occurred.",
         value             = movement["Date"],
         on_change         = update_movement_date,
         args              = [investment_id, movement_id],
@@ -37,6 +38,7 @@ def display_movement(containers, investment_id, movement, movement_id):
         unsafe_allow_html = True)
 	type_col_container.selectbox("Type", movement_types,
         key               = "type_%d_%d" % (investment_id, movement_id),
+        help              = "Type of movement (Buy/Sell).",
         index             = movement["Type"],
         on_change         = update_movement_type,
         args              = [investment_id, movement_id],
@@ -50,6 +52,7 @@ def display_movement(containers, investment_id, movement, movement_id):
         step              = 0.01,
         format            = '%.2f',
         key               = "amount_%d_%d" % (investment_id, movement_id),
+        help              = "The amount (in €) bought/sold in this movement.",
         value             = movement["Amount"],
         on_change         = update_movement_amount,
         args              = [investment_id, movement_id],
@@ -62,6 +65,7 @@ def display_movement(containers, investment_id, movement, movement_id):
         unsafe_allow_html = True)
 	remove_col_container.button("Remove",
         key               = "remove_%d_%d" % (investment_id, movement_id),
+        help              = "Remove this movement.",
 		on_click          = movements_manager.remove_movement,
         args              = [investment_id, movement_id])
 

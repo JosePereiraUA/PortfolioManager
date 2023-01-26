@@ -18,17 +18,30 @@ def load_portfolio_from_csv(contents):
 		is_investment_fund_in_file = st.session_state.investment_funds.loc[i, "Code"] in st.session_state.movements.index.get_level_values(0)
 		st.session_state.investment_funds.loc[i, "Display"] = is_investment_fund_in_file
 
+def count_movements(investment_id = None):
+    return st.session_state.movements.loc[
+        st.session_state.movements.index.get_level_values(0) == investment_id].shape[0]
+
+def get_investment_funds_with_movements():
+    return st.session_state.movements.index.get_level_values(0)
+
+def get_active_investment_funds(name_or_code = "Name"):
+    return list(st.session_state.investment_funds[
+        st.session_state.investment_funds["Display"] == True][name_or_code])
+
+def get_movements_of_investment_fund(investment_id):
+    return st.session_state.movements.loc[investment_id]
+
 def reindex_movements(investment_id):
 	df = st.session_state.movements
-	N  = df.loc[df.index.get_level_values(0) == investment_id].shape[0]
+	N  = count_movements(investment_id)
 	df = df.reset_index()
 	df.loc[df["Investment_fund"] == investment_id, "Movement_Index"] = range(N)
 	df = df.set_index(["Investment_fund", "Movement_Index"])
 	return df
 
 def add_movement(investment_id):
-	df = st.session_state.movements
-	N  = df.loc[df.index.get_level_values(0) == investment_id].shape[0]
+	N = count_movements(investment_id)
 	st.session_state.movements.loc[(investment_id, N), :] = [date.today(), 0, 0.0]
 	
 def remove_movement(investment_id = None, movement_id = None):

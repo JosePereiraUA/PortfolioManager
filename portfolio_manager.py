@@ -1,53 +1,33 @@
 import streamlit as st
 import pandas as pd
-from datetime import date
-
-def update_portfolio():
-	if not 'portfolio'in st.session_state:
-		st.session_state.portfolio = "No data."
-	if 'movements' in st.session_state:
-		st.session_state.portfolio = st.session_state.movements.to_csv().encode('utf-8')
+import movements_manager
 
 def toggle_load_portfolio_from_csv():
-	st.session_state.consume_new_csv_file_upload = True
-	
+    st.session_state.consume_new_csv_file_upload = True
+    
+def activate_investment_fund(investment_id):
+    # Sets the Display of the investment fund to True. Gets DataFrame series
+    # from investment ID code
+    st.session_state.investment_funds.loc[
+        st.session_state.investment_funds["Code"] == investment_id, "Display"] = True
+
+    # Check if this is the first activation. If it is, trigger the loading of
+    # historical data from online sources
+    
+    
 def load_portfolio_from_csv(contents):
-	st.session_state.movements = pd.read_csv(contents, index_col=[0,1], skipinitialspace=True, parse_dates = [2])
-	N = len(st.session_state.investment_funds)
-	for i in range(N):
-		is_investment_fund_in_file = st.session_state.investment_funds.loc[i, "Code"] in st.session_state.movements.index.get_level_values(0)
-		st.session_state.investment_funds.loc[i, "Display"] = is_investment_fund_in_file
-
-def count_movements(investment_id = None):
-    return st.session_state.movements.loc[
-        st.session_state.movements.index.get_level_values(0) == investment_id].shape[0]
-
-def get_investment_funds_with_movements():
-    return st.session_state.movements.index.get_level_values(0)
+    # The contents of the file automatically replace all previous saved movements.
+    st.session_state.movements = pd.read_csv(contents, index_col=[0,1],
+        skipinitialspace=True, parse_dates = [2])
+    
+    # Activate all investment funds found in the file
+    N = len(st.session_state.investment_funds)
+    for investment_id in range(N):
+        investment_funds_with_movements = movements_manager.get_investment_funds_with_movements()
+        is_investment_fund_in_file = st.session_state.investment_funds.loc[investment_id, "Code"] in investment_funds_with_movements
+        if is_investment_fund_in_file:
+            activate_investment_fund(investment_id)
 
 def get_active_investment_funds(name_or_code = "Name"):
     return list(st.session_state.investment_funds[
         st.session_state.investment_funds["Display"] == True][name_or_code])
-
-def get_movements_of_investment_fund(investment_id):
-    return st.session_state.movements.loc[investment_id]
-
-def reindex_movements(investment_id):
-	df = st.session_state.movements
-	N  = count_movements(investment_id)
-	df = df.reset_index()
-	df.loc[df["Investment_fund"] == investment_id, "Movement_Index"] = range(N)
-	df = df.set_index(["Investment_fund", "Movement_Index"])
-	return df
-
-def add_movement(investment_id):
-	N = count_movements(investment_id)
-	st.session_state.movements.loc[(investment_id, N), :] = [date.today(), 0, 0.0]
-	
-def remove_movement(investment_id = None, movement_id = None):
-	st.session_state.movements.drop((investment_id, movement_id), inplace = True)
-	st.session_state.movements = reindex_movements(investment_id)
-	
-def remove_all(investment_id = None):
-	st.session_state.movements = st.session_state.movements.loc[
-		st.session_state.movements.index.get_level_values(0) != investment_id]

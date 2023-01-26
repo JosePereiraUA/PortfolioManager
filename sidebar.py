@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 import portfolio_manager
 
 def update_investment_fund_tabs():
@@ -7,9 +6,10 @@ def update_investment_fund_tabs():
     # Called when changing the sidebar investment fund picker
     
     N = len(st.session_state.investment_funds)
-    for i in range(N):
-        is_investment_fund_selected = st.session_state.investment_funds.loc[i, "Name"] in st.session_state.investment_fund_picker
-        st.session_state.investment_funds.loc[i, "Display"] = is_investment_fund_selected
+    for investment_id in range(N):
+        is_investment_fund_selected = st.session_state.investment_funds.loc[investment_id, "Name"] in st.session_state.investment_fund_picker
+        if is_investment_fund_selected:
+            portfolio_manager.activate_investment_fund(investment_id)
 
 def display_sidebar():
         
@@ -32,7 +32,7 @@ def display_sidebar():
             on_change = portfolio_manager.toggle_load_portfolio_from_csv)
         
         # Download portfolio
-        st.download_button("Save portfolio", data = st.session_state.portfolio,
+        st.download_button("Save portfolio", data = st.session_state.movements_csv,
             help = "Save the current portfolio to a file.",
             file_name = "portofolio.csv", mime = "text/csv")
         

@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import date
+import historical_data_manager
 
 def update_movements_csv():
     # Continuously stores movement data to CSV
@@ -34,6 +35,7 @@ def add_movement(investment_id):
 def remove_movement(investment_id = None, movement_id = None):
     st.session_state.movements.drop((investment_id, movement_id), inplace = True)
     st.session_state.movements = reindex_movements(investment_id)
+    historical_data_manager.calc_historical_data_from_movements(investment_id)
     
 def remove_all(investment_id = None):
     st.session_state.movements = st.session_state.movements.loc[

@@ -10,6 +10,8 @@ def update_investment_fund_tabs():
         is_investment_fund_selected = st.session_state.investment_funds.loc[investment_id, "Name"] in st.session_state.investment_fund_picker
         if is_investment_fund_selected:
             portfolio_manager.activate_investment_fund(investment_id)
+        else:
+            portfolio_manager.deactivate_investment_fund(investment_id)
 
 def display_sidebar():
         

@@ -4,6 +4,7 @@ import sidebar
 import portfolio_manager
 import movements_manager
 import movements_display
+import historical_data_display
 
 # --- INIT VARIABLES -----------------------------------------------------------
 st.set_page_config(layout="wide")
@@ -18,6 +19,8 @@ if not 'investment_funds' in st.session_state:
 			["Caixa Acções Líderes Globais", "Caixa Seleção Global Arrojado"],
 		"Code":
 			[0, 1],
+		"Ticker":
+			["0P0000ZFDE.F", "0P00000SZ7.F"],
 		"Display":
 			[False, False]
 		 })
@@ -32,11 +35,7 @@ if not 'movements' in st.session_state:
 
 # Initialize the historical data
 if not 'historical_data' in st.session_state:
-	columns         = ['UP_Value', 'UPs', 'Invested', 'Total_Value']
-	row_indexes     = ['Investment_fund', 'Date']
-	row_multi_index = pd.MultiIndex.from_product([[], []], names = row_indexes)
-	st.session_state.historical_data = pd.DataFrame(columns = columns,
-		index = row_multi_index)
+	st.session_state.historical_data = {}
 
 # --- MAIN CYCLE ---------------------------------------------------------------
 movements_manager.update_movements_csv()
@@ -67,7 +66,7 @@ for index, row in st.session_state.investment_funds.iterrows():
 		movements_display.display_movements_controls(movements_cols, investment_id)
   
 		# Display historical data
-		# TODO
+		historical_data_display.display_historical_data(dashboard_col, investment_id)
   
 		tab_id += 1
 

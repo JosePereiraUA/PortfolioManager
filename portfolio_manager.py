@@ -26,7 +26,8 @@ def deactivate_investment_fund(investment_id):
 def load_portfolio_from_csv(contents):
     # The contents of the file automatically replace all previous saved movements.
     st.session_state.movements = pd.read_csv(contents, index_col=[0,1],
-        skipinitialspace=True, parse_dates = [2])
+        skipinitialspace=True, parse_dates = [2],
+        dtype = {"Type": int, "Amount": float})
     st.session_state.movements["Date"] = st.session_state.movements["Date"].dt.date
     
     # Activate all investment funds found in the file

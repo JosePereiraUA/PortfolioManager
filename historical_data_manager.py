@@ -1,7 +1,8 @@
+import movements_manager
 import streamlit as st
 import yfinance as yf
 import pandas as pd
-import movements_manager
+import numpy as np
 
 def get_investment_funds_with_historical_data():
     # Always returns the investment fund code
@@ -46,8 +47,15 @@ def calc_historical_data_from_movements(investment_id):
     reset_historical_data(investment_id)
     df = st.session_state.historical_data[investment_id]
     movements = movements_manager.get_movements_of_investment_fund(investment_id)
+    if movements is None: # Case no movements exist (after remove all, for example)
+        return
+    
     for (_, movement) in movements.iterrows():
         UP = df.asof(movement["Date"])["UP value"]
+        
+        if np.isnan(UP): # Case the introduced movement date is before available data
+            UP = df.iloc[0]["UP value"]
+
         if movement["Type"] == 0: # Buy
             df.loc[df.index > movement["Date"], 'Invested'] += movement["Amount"]
             df.loc[df.index > movement["Date"], 'UPs'] += movement["Amount"] / UP
@@ -56,5 +64,3 @@ def calc_historical_data_from_movements(investment_id):
             df.loc[df.index > movement["Date"], 'UPs'] -= movement["Amount"] / UP
     
     df["Total value"] = df["UPs"] * df["UP value"]
-    
-    print(st.session_state.historical_data[investment_id])

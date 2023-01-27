@@ -5,9 +5,12 @@ import portfolio_manager
 import movements_manager
 import movements_display
 import historical_data_display
+import utils
 
 # --- INIT VARIABLES -----------------------------------------------------------
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title = 'Portfolio Manager')
+
+utils.local_css("main.css")
 
 if not 'consume_new_csv_file_upload' in st.session_state:
 	st.session_state.consume_new_csv_file_upload = False

@@ -1,0 +1,32 @@
+/* Select Box */
+.stSelectbox>div>div>div:first-child{
+    padding: 9px;
+}
+
+.stSelectbox>div>div:hover{
+    border: 1px solid #ec3c3c;
+}
+
+/* Date Input */
+.stDateInput>div>div:hover{
+    border: 1px solid #ec3c3c;
+}
+
+.stDateInput>div>div>div>input{
+    padding-bottom: 7.8px;
+    padding-top: 7px;
+}
+
+/* Number Input */
+.stNumberInput>div:hover{
+    border: 1px solid #ec3c3c;
+}
+
+.stNumberInput>div>div>div{
+    padding: 1px;
+}
+
+/* Button */
+.stButton>div>div>div{
+    padding-top: 7px;
+}

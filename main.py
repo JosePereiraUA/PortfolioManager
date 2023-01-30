@@ -6,7 +6,6 @@ import streamlit as st
 import alert_display
 import pandas as pd
 import sidebar
-import utils
 
 # --- INIT VARIABLES -----------------------------------------------------------
 st.set_page_config(layout="wide", page_title = 'Portfolio Manager')
@@ -45,6 +44,13 @@ if not 'movements' in st.session_state:
 # Initialize the historical data
 if not 'historical_data' in st.session_state:
 	st.session_state.historical_data = {}
+if not 'historical_data_monthly' in st.session_state:
+	print("CALLED")
+	st.session_state.historical_data_monthly = {}
+if not 'historical_data_quarterly' in st.session_state:
+	st.session_state.historical_data_quarterly = {}
+if not 'historical_data_annual' in st.session_state:
+	st.session_state.historical_data_annual = {}
 
 # --- MAIN CYCLE ---------------------------------------------------------------
 movements_manager.update_movements_csv()

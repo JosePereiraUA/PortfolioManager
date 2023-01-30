@@ -27,9 +27,16 @@ def display_investment_fund_overview(container, investment_id):
     total_value = df.iloc[-1]["Total value"]
     total_invested = df.iloc[-1]["Invested"]
     total_profit = total_value - total_invested
+    total_profit_percentage = (total_profit / total_invested) * 100
     elapsed_time = df.index[-1] - df.index[0]
     
-    total_profit_delta = 0
+    monthly = st.session_state.historical_data_monthly[investment_id]
+    last_total_value = monthly.iloc[-2]["Total value"]
+    last_total_invested = monthly.iloc[-2]["Invested"]
+    total_profit_delta   = total_value - last_total_value
+    total_invested_delta = total_invested - last_total_invested
+    last_profit = ((last_total_value - last_total_invested) / last_total_invested) * 100
+    total_profit_percentage_delta = total_profit_percentage - last_profit
     
     total_value_col.metric(label = "Value (€)",
         value = "%.2f€" % (total_value),
@@ -39,17 +46,17 @@ def display_investment_fund_overview(container, investment_id):
     total_invested_col.metric(label = "Invested (€)",
         value = "%.2f€" % (total_invested),
         help = "The total invested. The movements refers to the variation in the last month.",
-        delta = "%.1f€" % (total_profit_delta))
+        delta = "%.1f€" % (total_invested_delta))
     
     total_profit_col.metric(label = "Total profit (€)",
         value = "%.2f€" % (total_profit),
         help = "The profit value. The movements refers to the variation in the last month.",
-        delta = "%.1f€" % (total_profit_delta))
+        delta = "%.1f€" % (total_profit_delta - total_invested_delta))
     
     total_profit_percentage_col.metric(label = "Total profit (%)",
-        value = "%.1f%%" % ((total_profit / total_invested) * 100),
+        value = "%.1f%%" % (total_profit_percentage),
         help = "The percentage difference between the total value invested and current value of the fund. The percentage movements refers to the variation in the last month.",
-        delta = "%.1f%%" % (total_profit_delta))
+        delta = "%.1f%%" % (total_profit_percentage_delta))
     
     elapsed_time_col.metric(label = "Elapsed time",
         value = "%d days" % (elapsed_time.days),

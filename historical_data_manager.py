@@ -97,3 +97,9 @@ def calc_historical_data_from_movements(investment_id):
             df.loc[df.index > movement["Date"], 'UPs'] -= movement["Amount"] / UP
     
     df["Total value"] = df["UPs"] * df["UP value"]
+    
+    # Calculate monthly, quarterly and annual historical data
+    df.index = pd.to_datetime(df.index)
+    st.session_state.historical_data_monthly[investment_id]  = df.resample('M').last()
+    st.session_state.historical_data_quarterly[investment_id] = df.resample('Q').last()
+    st.session_state.historical_data_annual[investment_id]   = df.resample('A').last()

@@ -35,7 +35,7 @@ def reindex_movements(investment_id):
 def add_movement(investment_id):
     df = st.session_state.movements
     N = count_movements(investment_id)
-    df.loc[(investment_id, N), :] = [date.today(), 0, 40.0]
+    df.loc[(investment_id, N), :] = [date.today(), 0, 0.0]
     df["Type"] = pd.to_numeric(df["Type"], downcast='integer')
     df.sort_index()
 

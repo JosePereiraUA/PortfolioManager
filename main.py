@@ -1,16 +1,22 @@
-import streamlit as st
-import pandas as pd
-import sidebar
+import historical_data_display
 import portfolio_manager
 import movements_manager
 import movements_display
-import historical_data_display
+import streamlit as st
+import alert_display
+import pandas as pd
+import sidebar
 import utils
 
 # --- INIT VARIABLES -----------------------------------------------------------
 st.set_page_config(layout="wide", page_title = 'Portfolio Manager')
 
-utils.local_css("main.css")
+# Apply custom CSS configuration 
+with open("main.css") as f:
+	st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+if not 'alerts' in st.session_state:
+	st.session_state.alerts = []
 
 if not 'consume_new_csv_file_upload' in st.session_state:
 	st.session_state.consume_new_csv_file_upload = False
@@ -56,6 +62,9 @@ list_of_all_investment_funds_with_movements = movements_manager.get_investment_f
 for index, row in st.session_state.investment_funds.iterrows():
 	investment_id, display_tab = row["Code"], row["Display"]
 	if display_tab:
+		alert_display.display_alerts(tabs[tab_id], investment_id)
+		historical_data_display.display_investment_fund_overview(tabs[tab_id], investment_id)
+     
 		date_col, type_col, amount_col, remove_col, dashboard_col = tabs[tab_id].columns([1, 1, 1, 1, 4])
 		movements_cols = [date_col, type_col, amount_col, remove_col]
 

@@ -21,15 +21,11 @@ def display_investment_fund_overview(container, investment_id):
     container.markdown('<p style="font-size: 15px;">⠀</p>', unsafe_allow_html = True)
     total_value_col, total_invested_col, total_profit_col, total_profit_percentage_col, elapsed_time_col, annualized_profit_col = container.columns(6)
     
-    movements = st.session_state.movements.loc[investment_id]
-    earliest_date = movements["Date"].min()
-    initial_value = movements[movements["Date"] == earliest_date]["Amount"].values[0]
     total_value = df.iloc[-1]["Total value"]
     total_invested = df.iloc[-1]["Invested"]
     total_profit = total_value - total_invested
     total_profit_percentage = (total_profit / total_invested) * 100
     elapsed_time = df.index[-1] - df.index[0]
-    
     monthly = st.session_state.historical_data_monthly[investment_id]
     last_total_value = monthly.iloc[-2]["Total value"]
     last_total_invested = monthly.iloc[-2]["Invested"]
@@ -37,7 +33,7 @@ def display_investment_fund_overview(container, investment_id):
     total_invested_delta = total_invested - last_total_invested
     last_profit = ((last_total_value - last_total_invested) / last_total_invested) * 100
     total_profit_percentage_delta = total_profit_percentage - last_profit
-    
+        
     total_value_col.metric(label = "Value (€)",
         value = "%.2f€" % (total_value),
         help = "The current total value of the investment. The movements refers to the variation in the last month.",

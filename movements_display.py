@@ -1,12 +1,13 @@
-import streamlit as st
-import movements_manager
 import historical_data_manager
+import movements_manager
+import streamlit as st
+import pandas as pd
 
 movement_types = ["Buy", "Sell"]
 
 def update_movement_date(investment_id = None, movement_id = None):
     st.session_state.movements.loc[(investment_id, movement_id),
-        "Date"] = st.session_state["date_%d_%d" % (investment_id, movement_id)]
+        "Date"] = pd.to_datetime(st.session_state["date_%d_%d" % (investment_id, movement_id)])
     historical_data_manager.calc_historical_data_from_movements(investment_id)
 
 def update_movement_type(investment_id = None, movement_id = None):

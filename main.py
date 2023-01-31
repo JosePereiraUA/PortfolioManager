@@ -45,7 +45,6 @@ if not 'movements' in st.session_state:
 if not 'historical_data' in st.session_state:
 	st.session_state.historical_data = {}
 if not 'historical_data_monthly' in st.session_state:
-	print("CALLED")
 	st.session_state.historical_data_monthly = {}
 if not 'historical_data_quarterly' in st.session_state:
 	st.session_state.historical_data_quarterly = {}
@@ -69,7 +68,9 @@ for index, row in st.session_state.investment_funds.iterrows():
 	investment_id, display_tab = row["Code"], row["Display"]
 	if display_tab:
 		alert_display.display_alerts(tabs[tab_id], investment_id)
-		historical_data_display.display_investment_fund_overview(tabs[tab_id], investment_id)
+		
+		if movements_manager.count_movements(investment_id) > 0:
+			historical_data_display.display_investment_fund_overview(tabs[tab_id], investment_id)
      
 		date_col, type_col, amount_col, remove_col, dashboard_col = tabs[tab_id].columns([1, 1, 1, 1, 4])
 		movements_cols = [date_col, type_col, amount_col, remove_col]

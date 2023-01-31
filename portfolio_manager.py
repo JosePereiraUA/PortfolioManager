@@ -29,6 +29,7 @@ def load_portfolio_from_csv(contents):
         skipinitialspace=True, parse_dates = [2],
         dtype = {"Type": int, "Amount": float})
     st.session_state.movements["Date"] = st.session_state.movements["Date"].dt.date
+    st.session_state.movements["Date"] = pd.to_datetime(st.session_state.movements["Date"])
     
     # Activate all investment funds found in the file
     N = len(st.session_state.investment_funds)

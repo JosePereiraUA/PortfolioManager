@@ -15,9 +15,7 @@ def display_alerts(container, investment_id):
             container.error(alert.message, icon = '🔥')
             
 def add_unique_alert(alert):
-    print("CALLED")
     unique_ids = [a.unique_id for a in st.session_state.alerts]
-    print(alert.unique_id in unique_ids)
     if not alert.unique_id in unique_ids:
         st.session_state.alerts.append(alert)
 

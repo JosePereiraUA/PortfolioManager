@@ -63,6 +63,8 @@ def load_historical_data(investment_id):
     historical_data = pd.concat([historical_data, data])
     st.session_state.historical_data[investment_id] = historical_data
     reset_historical_data(investment_id)
+    st.session_state.historical_data[investment_id].index = pd.to_datetime(
+        st.session_state.historical_data[investment_id].index)
 
 def calc_historical_data_from_movements(investment_id):
     reset_historical_data(investment_id)
@@ -100,6 +102,14 @@ def calc_historical_data_from_movements(investment_id):
     
     # Calculate monthly, quarterly and annual historical data
     df.index = pd.to_datetime(df.index)
-    st.session_state.historical_data_monthly[investment_id]  = df.resample('M').last()
+    st.session_state.historical_data_monthly[investment_id]   = df.resample('M').last()
+    st.session_state.historical_data_monthly[investment_id].index = st.session_state.historical_data_monthly[investment_id].index.to_period('M')
     st.session_state.historical_data_quarterly[investment_id] = df.resample('Q').last()
-    st.session_state.historical_data_annual[investment_id]   = df.resample('A').last()
+    st.session_state.historical_data_quarterly[investment_id].index = st.session_state.historical_data_quarterly[investment_id].index.to_period('Q')
+    st.session_state.historical_data_annual[investment_id]    = df.resample('A').last()
+    st.session_state.historical_data_annual[investment_id].index = st.session_state.historical_data_annual[investment_id].index.to_period('A')
+    
+    # Calculate monthly returns
+    df = st.session_state.historical_data_monthly[investment_id]
+    df['Monthly return'] = df['Invested'] - df['Invested'].shift(1)
+    print(df['Monthly return'])

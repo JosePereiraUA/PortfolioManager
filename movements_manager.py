@@ -39,6 +39,7 @@ def add_movement(investment_id):
     df["Type"] = pd.to_numeric(df["Type"], downcast='integer')
     df["Date"] = pd.to_datetime(df["Date"])
     df.sort_index()
+    historical_data_manager.calc_historical_data_from_movements(investment_id)
 
 def remove_movement(investment_id = None, movement_id = None):
     st.session_state.movements.drop((investment_id, movement_id), inplace = True)

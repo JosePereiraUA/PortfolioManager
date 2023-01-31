@@ -48,8 +48,8 @@ if not 'historical_data_monthly' in st.session_state:
 	st.session_state.historical_data_monthly = {}
 if not 'historical_data_quarterly' in st.session_state:
 	st.session_state.historical_data_quarterly = {}
-if not 'historical_data_annual' in st.session_state:
-	st.session_state.historical_data_annual = {}
+if not 'historical_data_annually' in st.session_state:
+	st.session_state.historical_data_annually = {}
 
 # --- MAIN CYCLE ---------------------------------------------------------------
 movements_manager.update_movements_csv()

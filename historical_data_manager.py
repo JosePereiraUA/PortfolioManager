@@ -77,6 +77,7 @@ def calc_historical_data_from_movements(investment_id):
     
     # Alert users when there's missing data
     earliest_date = movements["Date"].min()
+    latest_date   = movements["Date"].max()
     if df.index.min() > earliest_date:
         alert_display.add_unique_alert(alert_display.Alert('missing_early_data',
             investment_id,
@@ -85,6 +86,14 @@ def calc_historical_data_from_movements(investment_id):
     else:
         alert_display.remove_unique_alert('missing_early_data')
     
+    if df.index.max().date() <= latest_date.date():
+        alert_display.add_unique_alert(alert_display.Alert('missing_late_data',
+            investment_id,
+            "The loaded historical data from both local and online sources does not contain data entries after the latest movement date in your portfolio (%s). The latest date we could find data for is %s. Consider manually checking the local data source for this investment fund." % \
+            (latest_date.date(), df.index.max().date())))
+    else:
+        alert_display.remove_unique_alert('missing_late_data')
+        
     for (_, movement) in movements.iterrows():
         UP = df.asof(movement["Date"])["UP value"]
         
@@ -98,18 +107,45 @@ def calc_historical_data_from_movements(investment_id):
             df.loc[df.index > movement["Date"], 'Invested'] -= movement["Amount"]
             df.loc[df.index > movement["Date"], 'UPs'] -= movement["Amount"] / UP
     
+    # Check for negative UPs
+    negative_ups = False
+    for (date, data) in df.iterrows():
+        m = movements.loc[movements["Date"] <= date, "Date"]
+        if len(m) > 0:
+            d = movements.loc[m.idxmax()]["Date"].date()
+            UP_count = data['UPs']
+            if UP_count < 0:
+                alert_display.add_unique_alert(alert_display.Alert('negative_ups',
+                    investment_id,
+                    "According to the movement list, the 'Sell' action at %s resulted in a negative number of shares. Verify that this is the desired behaviour." % d))
+                negative_ups = True
+    if not negative_ups:
+        alert_display.remove_unique_alert('negative_ups')
+    
     df["Total value"] = df["UPs"] * df["UP value"]
     
+    # Check for negative number of UPs
+    
     # Calculate monthly, quarterly and annual historical data
-    df.index = pd.to_datetime(df.index)
-    st.session_state.historical_data_monthly[investment_id]   = df.resample('M').last()
+    df.index           = pd.to_datetime(df.index)
+    st.session_state.historical_data_monthly[investment_id] = df.resample('M').last()
+    # df_monthly         = st.session_state.historical_data_monthly[investment_id]
+    st.session_state.historical_data_monthly[investment_id] = st.session_state.historical_data_monthly[investment_id][
+        st.session_state.historical_data_monthly[investment_id].index >= earliest_date]
     st.session_state.historical_data_monthly[investment_id].index = st.session_state.historical_data_monthly[investment_id].index.to_period('M')
     st.session_state.historical_data_quarterly[investment_id] = df.resample('Q').last()
-    st.session_state.historical_data_quarterly[investment_id].index = st.session_state.historical_data_quarterly[investment_id].index.to_period('Q')
-    st.session_state.historical_data_annual[investment_id]    = df.resample('A').last()
-    st.session_state.historical_data_annual[investment_id].index = st.session_state.historical_data_annual[investment_id].index.to_period('A')
+    df_quarterly       = st.session_state.historical_data_quarterly[investment_id]
+    df_quarterly       = df_quarterly[df_quarterly.index >= earliest_date]
+    df_quarterly.index = df_quarterly.index.to_period('Q')
+    st.session_state.historical_data_annually[investment_id] = df.resample('A').last()
+    df_annually         = st.session_state.historical_data_annually[investment_id]
+    df_annually         = df_annually[df_annually.index >= earliest_date]
+    df_annually.index   = df_annually.index.to_period('A')
     
     # Calculate monthly returns
     df = st.session_state.historical_data_monthly[investment_id]
-    df['Monthly return'] = df['Invested'] - df['Invested'].shift(1)
-    print(df['Monthly return'])
+    df['Monthly invested']      = df['Invested'] - df['Invested'].shift(1)
+    first_buy_movement          = movements_manager.get_first_movement_of_type(investment_id, 0)
+    df.iat[0, 4]                = first_buy_movement['Amount']
+    df['Monthly return']        = ((df['Total value'] - df['Monthly invested']) / df['Total value'].shift(1)) - 1
+    df.iat[0, 5]                = (df.iloc[0]['Total value'] - df.iloc[0]['Monthly invested']) / df.iloc[0]['Monthly invested']

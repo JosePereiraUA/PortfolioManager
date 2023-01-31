@@ -24,6 +24,13 @@ def get_movements_of_investment_fund(investment_id):
     else:
         return st.session_state.movements.loc[investment_id]
 
+def get_first_movement_of_type(investment_id, movement_type):
+    df  = st.session_state.movements.loc[investment_id].sort_values(by=['Date'])
+    for i in range(len(st.session_state.movements.loc[investment_id])):
+        row = df.iloc[i]
+        if row['Type'] == movement_type:
+            return row
+
 def reindex_movements(investment_id):
     df = st.session_state.movements
     N  = count_movements(investment_id)

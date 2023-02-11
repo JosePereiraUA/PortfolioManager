@@ -82,7 +82,7 @@ def calc_historical_data_from_movements(investment_id):
         alert_display.add_unique_alert(alert_display.Alert('missing_early_data',
             investment_id,
             "The loaded historical data from both local and online sources does not contain data entries that predate the earliest movement date in your portfolio (%s). The earliest date we could find is %s. Consider manually checking the local data source for this investment fund." % \
-            (earliest_date, df.index.min())))
+            (earliest_date.date(), df.index.min().date())))
     else:
         alert_display.remove_unique_alert('missing_early_data')
     

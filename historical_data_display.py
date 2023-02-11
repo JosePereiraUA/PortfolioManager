@@ -21,7 +21,7 @@ def display_investment_fund_overview(container, investment_id):
     monthly = st.session_state.historical_data_monthly[investment_id]
     
     container.markdown('<p style="font-size: 15px;">⠀</p>', unsafe_allow_html = True)
-    total_value_col, total_invested_col, total_profit_col, total_profit_percentage_col, elapsed_time_col, annualized_profit_col = container.columns(6)
+    total_value_col, total_invested_col, total_profit_col, total_profit_percentage_col, elapsed_time_col, annualized_profit_col, total_UPs_col = container.columns(7)
     
     total_value = df.iloc[-1]["Total value"]
     total_invested = df.iloc[-1]["Invested"]
@@ -58,6 +58,10 @@ def display_investment_fund_overview(container, investment_id):
     
     annualized_return = (((monthly['Monthly return'] + 1).prod()) ** (12 / len(monthly['Monthly return'])) - 1) * 100
 
+    total_UPs = df.iloc[-1]["UPs"]
+    last_total_UPs = monthly.iloc[-2]["UPs"]
+    total_UPs_delta = total_UPs - last_total_UPs
+
     total_value_col.metric(label = "Value (€)",
         value = "%.2f€" % (total_value),
         help  = "The current total value of the investment. The movements refers to the variation in the last month.",
@@ -85,5 +89,10 @@ def display_investment_fund_overview(container, investment_id):
     annualized_profit_col.metric(label = "Annualized profit (%)",
         value = "%.1f%%" % (annualized_return),
         help  = "The annualized percentage difference between the total value invested and the value of the fund.")
+    
+    total_UPs_col.metric(label = "Total UPs",
+        value = "%.1f UPs" % (total_UPs),
+        help  = "The total number of UPs currently in the fund. The movement refers to the variation in the last month.",
+        delta = "%.1f UPs" % (total_UPs_delta))
     
     container.markdown('<p style="font-size: 15px;">⠀</p>', unsafe_allow_html = True)

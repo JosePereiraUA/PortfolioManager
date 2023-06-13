@@ -149,3 +149,14 @@ def calc_historical_data_from_movements(investment_id):
     df.iat[0, 4]                = first_buy_movement['Amount']
     df['Monthly return']        = ((df['Total value'] - df['Monthly invested']) / df['Total value'].shift(1)) - 1
     df.iat[0, 5]                = (df.iloc[0]['Total value'] - df.iloc[0]['Monthly invested']) / df.iloc[0]['Monthly invested']
+    
+def load_inflation_data():
+    url = 'https://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/prc_hicp_manr.tsv.gz&unzip=true'
+    inf = pd.read_table(url, sep=r"[,\t]", engine = 'python')
+    inf.drop(columns=['unit'], inplace = True)
+    inf.set_index(['coicop', 'geo\\time'], inplace = True)
+    pt_inf = inf.loc['CP00', 'PT']
+    pt_inf = pt_inf.apply(lambda x: float(x.replace(" ", "").replace("e", "")))
+    pt_inf = pt_inf.reset_index()
+    pt_inf["index"] = pt_inf["index"].apply(lambda x: x.replace(" ", "").replace("e", ""))
+    pt_inf.set_index(["index"], inplace = True)
